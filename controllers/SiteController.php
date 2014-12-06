@@ -56,14 +56,44 @@ class SiteController extends Controller {
             ]);
         } else {
             $mongo = new MongoHelper();
+            $categoryName = "dairy";
+            $deacription = "Red pears product of u.s.a., extra fancy grade red d'anjou pears & pc® goat's milk cheese sweet and juicy red pears, combined with the refreshing bite of goat's cheese, create a perfectly light, elegant dessert.";
+            $opric = 4.99;
+            $spric = 3.95;
+            $price2 = "$1.79 lb / 3.95/kg";
+            $storeName = "Independent";
+            $ends = "2014-12-11 00:00:00";
+            
+            $price1 = "$" . $opric;
+            //$price2="$".$spric;
+           
+            
+            $saved = $model->savingsEstimator($opric, $spric);
+
+            $sarts = "2014-12-01 00:00:00";
+           
+            $start_date = new \MongoDate(strtotime($sarts));
+            $end_date = new \MongoDate(strtotime($ends));
+            $effective = date('M j', strtotime($ends));
+            $category = $mongo->getCategory(["name" => $categoryName]);
+            $store = $mongo->getStore(['name' => $storeName]);
             $row = array(
-                "description" => "Roasted brand cocnut milk 398 ml",
-                "category" => "dairy",
-                "originalPrice" => "$1.29",
-                "salePrice" => "$0.79",
-                "savings" => '38.75%',
-                "store" => "Farm Boy",
-                "effective" => "2014-12-15T21:00:00-05:00",
+                "description" => $deacription,
+                "category" => $categoryName,
+                "categoryId" => $category['_id'],
+                "originalPricePure" => $opric,
+                "originalPrice" => $price1,
+                "salePricePure" => $spric,
+                "salePrice" => $price2,
+                "savings" => $saved,
+                "store" => $storeName,
+                "storeId" => $store['_id'],
+                "effective" => "Until " . $effective,
+                "startDate" => $start_date,
+                "endDate" => $end_date,
+            );
+            $category = array(
+                'name' => 'dairy'
             );
             $headers = array(
                 array("description" => "Description of Product"),
@@ -74,16 +104,19 @@ class SiteController extends Controller {
                 array("store" => "Store Name"),
                 array("effective" => "Effective Until"),
             );
+            $tableHeaders=$model->tableHeader();
+            
             //$mongo->insertGrocerie($row);
             //$mongo->insertSearchResultsTableHeaders($headers);
-
-            $output = $mongo->getSearchResultsTableHeaders();
+            //$mongo->insertCategory($category);
+            //$output = $mongo->getGroceriesList();
             return $this->render('index', [
-                        'model' => $model, 'result' => FALSE, 'output' => $output
+                        'model' => $model, 'result' => FALSE, 'tableHeaders' => $tableHeaders
             ]);
         }
 
         //return $this->render('index');
+        
     }
 
     public function actionPage() {

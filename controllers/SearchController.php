@@ -22,14 +22,24 @@ class SearchController extends \yii\web\Controller
         } else {
             $mongo=new MongoHelper();
             $row=array(
-           "description"=> "Roasted brand cocnut milk 398 ml",
+           "description"=> "Carnation evaporated milk selected varieties 370 ml",
            "category"=>"dairy",
-           "originalPrice"=>"$1.29",
-           "salePrice"=>"$0.79",
-           "savings"=>'38.75%',
-           "store"=>"Farm Boy",
-           "effective"=>"2014-12-15T21:00:00-05:00",
+           "category"=>"dairy",
+           "originalPricePure"=>"2.10",
+           "originalPrice"=>"$2.10",
+           "salePricePure"=>"1.34",
+           "salePrice"=>"3/$4 or $1.34 ea.",
+           "savings"=>'36.00%',
+           "store"=>"Independent",
+           "storeId"=>"Independent",
+           "effective"=>"Until Dec 10",
+           "startDate"=>"2014-12-01T21:00:00-05:00",
+           "endDate"=>"2014-12-05T21:00:00-05:00",
+           
            );
+            $store=array(
+                "name"=>"Bulk Barn"
+            );
             $headers=array(
             array("description"=>"Description of Product"),
             array("category"=>"Category"),
@@ -40,9 +50,10 @@ class SearchController extends \yii\web\Controller
             array("effective"=>"Effective Until"),
          );
            //$mongo->insertGrocerie($row);
-           //$mongo->insertSearchResultsTableHeaders($headers);
+           //$mongo->insertStore($store);
+          // $mongo->insertSearchResultsTableHeaders($headers);
            
-            $output=$mongo->getSearchResultsTableHeaders();
+            $output=$mongo->getStoreList();
             return $this->render('index', [
                 'model' => $model,'result' =>FALSE, 'output' => $output
             ]);

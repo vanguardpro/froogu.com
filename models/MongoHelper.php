@@ -40,16 +40,49 @@ class MongoHelper extends Model {
      
     }
     
-    public function getGroceriesList($query){
-       $groceries=Yii::$app->mongodb->getCollection('groceries'); 
+    public function getGroceriesList($query=[]){
+       $collection=Yii::$app->mongodb->getCollection('groceries');
+       return iterator_to_array($collection->find($query));
+      // "categoryId"=>new ObjectId('54813a35ace20a7b010041ab'),
+       //try to find groseires which contain word or words in name not in the same order:
+       //could be chocolate milk but return chocolate butter milk etc
+       //if return more when 0 saveQuery
+    }
+    public function getStoreList($query=[]){
+       $collection=Yii::$app->mongodb->getCollection('store');
+       return iterator_to_array($collection->find($query));
+       //try to find groseires which contain word or words in name not in the same order:
+       //could be chocolate milk but return chocolate butter milk etc
+       //if return more when 0 saveQuery
+    }
+    public function getStore($query=[]){
+       $collection=Yii::$app->mongodb->getCollection('store');
+       return $collection->findOne($query);
+      
+    }
+    public function getCategoryList($query=[]){
+       $collection=Yii::$app->mongodb->getCollection('category');
+       return iterator_to_array($collection->find($query));
        //try to find groseires which contain word or words in name not in the same order:
        //could be chocolate milk but return chocolate butter milk etc
        //if return more when 0 saveQuery
     }
     
     public function insertGrocerie($grocerie=[]){
-       $groceries=Yii::$app->mongodb->getCollection('groceries'); 
-       $groceries->insert($grocerie);
+       $collection=Yii::$app->mongodb->getCollection('groceries'); 
+       $collection->insert($grocerie);
+    }
+    public function getCategory($query=[]){
+       $collection=Yii::$app->mongodb->getCollection('category');
+       return $collection->findOne($query);
+    }
+    public function insertCategory($category=[]){
+       $collection=Yii::$app->mongodb->getCollection('category'); 
+       $collection->insert($category);
+    }
+    public function insertStore($stores=[]){
+       $collection=Yii::$app->mongodb->getCollection('store'); 
+       $collection->insert($stores);
     }
     
     public function insertSearchResultsTableHeaders($headers=[]){
@@ -58,7 +91,9 @@ class MongoHelper extends Model {
     }
     public function getSearchResultsTableHeaders(){
        $groceriesHeaders=Yii::$app->mongodb->getCollection('groceriesHeaders'); 
-       return iterator_to_array($groceriesHeaders->find());
+       $curosrArray=$this->cursorToArray($groceriesHeaders->find(array(), array('_id' => 0)));
+       
+       return $curosrArray;
     }
 
     public function mongoColection() {
@@ -82,6 +117,16 @@ class MongoHelper extends Model {
         
         $cursor=$collection->find($condition);
         return iterator_to_array($cursor);
+    }
+    
+    private function cursorToArray($cursor, $keep_id=FALSE){
+        foreach ($cursor as $array){
+                if(key_exists("_id", $array)&&!$keep_id){
+                    unset($array['_id']);
+                }
+              
+           }
+        return $array;
     }
 
 }
