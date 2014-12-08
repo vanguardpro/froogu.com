@@ -93,7 +93,65 @@ a.desc:after {
 .search-bar{
     max-width: 500px;
     margin: auto;
+    float: left;
+    min-width: 200px;
+    width:80% !important;
+    height: 50px;
+    border-radius:0px;
+    font-size: 18px;
+
 }
 .description-field{
     max-width: 500px;
+    
+}
+.submitButton{
+    width: 100%;
+    float: left;
+    max-width: 150px;
+    height: 50px;
+    border-radius:0px;
+
+}
+
+@media screen and (max-width: 650px) {
+    .submitButton{
+   max-width: 120px;
+
+}
+}
+@media screen and (max-width: 570px) {
+    .submitButton{
+   max-width: 100px;
+
+}
+}
+
+@media screen and (max-width: 530px) {
+    .submitButton{
+   max-width: 70px;
+
+}
+}
+div.mail-search .has-error{
+    max-width: 500px;
+
+}
+div.mail-search div.form-group.field-searchform-query{
+    max-width: 500px;
+    max-height: 10px;
+    padding: auto;
+    margin: auto;
+
+}
+div.mail-search p.help-block{
+    height: 100px;
+    padding-top: 50px
+}
+div.mail-search i.cerror{
+    margin-top: 50px;
+    line-height: 220%;
+}
+.table.ctable{
+    margin-top: 100px;
 }

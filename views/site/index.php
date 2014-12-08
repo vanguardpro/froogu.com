@@ -7,14 +7,15 @@ use yii\bootstrap\ActiveForm;
     <h1>FROOGU</h1>
 
     <div class="row">
-        <div class="col-lg-12 text-center">
+        <div class="col-lg-12 text-center mail-search">
             <?php $form = ActiveForm::begin(['id' => 'search-form']); ?>
             <?= $form->field($model, 'query', [
-  'template' => "<i class='fa fa-user'></i>\n{input}\n{hint}\n{error}"
+  'template' => "\n{input}\n"
 ])->textInput(array('placeholder' => 'Enter a product name', 'class'=>'form-control search-bar')); ?>
-            <div class="form-group ">
-                <?= Html::submitButton('Search', ['class' => 'btn btn-primary push-right', 'name' => 'search-button']) ?>
-            </div>
+            <?= Html::submitButton('Search', ['class' => 'btn btn-primary submitButton', 'name' => 'search-button']) ?>
+            <?= $form->field($model, 'query', [
+  'template' => "<i class='fa fa-user cerror'>\n\n{hint}\n{error}</i>\n\n</i>"
+])->textInput(array('placeholder' => 'Enter a product name', 'class'=>'form-control search-bar')); ?>
             <?php ActiveForm::end(); ?>
         </div>
 
@@ -22,7 +23,7 @@ use yii\bootstrap\ActiveForm;
         <?php if ($result && !is_string($result)) { 
       //  echo print_r($result ); exit();
 ?>
-            <table class="table table-striped"><tr>
+            <table class="table table-striped ctable"><tr>
                     <?php
                     $i = 0;
                     foreach ($tableHeaders as $k => $v) {
@@ -71,28 +72,6 @@ use yii\bootstrap\ActiveForm;
 
 
 
-/*
-
- * <?php foreach ($tableHeaders as $th) { ?>
-
-  <th><?= $th ?></th>
-
-  <?php }
-  ?>
-  </tr>
-  <?php foreach ($result['result'] as $v) { ?>
-  <tr>
-  <?php
-  foreach ($tableHeaders as $th) { ?>
-  <?php if (isset($v[$th])) { ?>
-  <td><?= $v[$th] ?></td>
-  <?php
-
-  }
-  }
-  }
-  ?>
- *  */
 ?>                    
     </div>
 </div>
