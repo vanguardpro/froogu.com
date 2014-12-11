@@ -3,7 +3,7 @@
 
 # netbeans project files
 nbproject
-
+error_log
 # zend studio for eclipse project files
 .buildpath
 .project
@@ -13,7 +13,7 @@ nbproject
 Thumbs.db
 
 # composer vendor dir
-/vendor
+#/vendor
 
 # composer itself is not needed
 composer.phar
