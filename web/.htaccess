@@ -1,4 +1,0 @@
-AuthType Basic
-AuthName "web"
-AuthUserFile "/home/webitpro/.htpasswds/froogu/web/passwd"
-require valid-user
