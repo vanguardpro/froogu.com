@@ -49,9 +49,7 @@ class SearchController extends \yii\web\Controller
             array("store"=>"Store Name"),
             array("effective"=>"Effective Until"),
          );
-           //$mongo->insertGrocerie($row);
-           //$mongo->insertStore($store);
-          // $mongo->insertSearchResultsTableHeaders($headers);
+       
            
             $output=$mongo->getStoreList();
             return $this->render('index', [
@@ -59,21 +57,7 @@ class SearchController extends \yii\web\Controller
             ]);
         }
         
-        //return $this->render('index');
+       
     }
 
 }
-/*
-
- * Array
-(   Yii::$app->request->post()
-    [_csrf] => YllEby1aSFQKEhANAC8YFikvBiBhFSMNJA58K2IYeBEqaT4/GwsmBg==
-    [SearchForm] => Array
-        (
-            [product] => 23456
-        )
-
-    [search-button] => 
-)
- * 
- *  */

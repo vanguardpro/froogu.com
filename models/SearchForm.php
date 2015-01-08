@@ -57,7 +57,17 @@ class SearchForm extends Model {
             return false;
         }
     }
-
+    private function highlightSearch($result, $query=array()){
+        if ($result && !is_string($result)) { 
+            foreach ($result as $key => &$value) {
+                foreach ($query as $word){
+                $value['description']=  str_replace($word, '<strong>'.$word.'</strong>', $value['description']);
+                }
+            }
+        }
+        return $result;
+        
+    }
     public function tableHeader() {
         /* return array(
           array("description"=>"Description of Product"),
@@ -73,106 +83,98 @@ class SearchForm extends Model {
         return $searchResuls;
     }
 
-    private function doSearch() {
-        $trim_query=  trim($this->searchQuery);
-        $user_query = preg_replace("/[[:blank:]]+/", " ", $trim_query);
-        $arr_query = explode(' ', $user_query);
-        
-        if (count($arr_query) > 1) {
+    function pc_permute($items, $perms = array()) {
+        if (empty($items)) {
+            $return = array($perms);
+        } else {
+            $return = array();
+            for ($i = count($items) - 1; $i >= 0; --$i) {
+                $newitems = $items;
+                $newperms = $perms;
+                list($foo) = array_splice($newitems, $i, 1);
+                array_unshift($newperms, $foo);
+                $return = array_merge($return, $this->pc_permute($newitems, $newperms));
+            }
+        }
+        return $return;
+    }
 
-            $query = array(
+    private function doSearch() {
+        $trim_query = trim($this->searchQuery);
+        //remove all blank spaces
+        $user_query = preg_replace("/[[:blank:]]+/", " ", $trim_query);
+        //shrink by spaces and create array of words
+        //we can try to make first call as is e.g, add synonims etc, but for now just word by word
+        $arr_query = explode(' ', $user_query);
+        $counter = 0;
+        $v_counter = 0;
+        // echo "<pre>" . print_r($arr_query, TRUE) . "</pre>";
+        $counter = count($arr_query);
+
+        //here there is a limit of 5 query words or 120 combinations (could be increased to 6, not more!)
+        if ($counter > 1 && $counter < 6) {
+
+            $query1 = array(
                 '$or' => array()
             );
 
-            foreach ($arr_query as $q) {
-                $query['$or'][] = array('description' => array('$regex' => $q));
-                $query['$or'][] = array('store' => array('$regex' => $q));
-            }
-        } else {
-            
 
-            $query = array(
+
+            $set = $this->pc_permute($arr_query);
+            $a = 0;
+            $s_counter = count($set); //this is counter of all possible combination if word 5 - 120 combintaions , 6 - 720 (search up to 4 sec)
+            // in theory $s_counter should be the same as $counter 
+            foreach ($set as $k => $v) {
+                $v_counter = count($v); //0, 1, 2, 3, 4, 5 ...this is counter of words (I would take 5 max)
+
+                $i = 0;
+                foreach ($v as $k1 => $v1) {
+                    for ($v_c_var = 0; $v_c_var < $v_counter; $v_c_var++) {
+                        if ($i == $v_c_var) {
+                            for ($var = 0; $var < $s_counter; $var++) {
+                                ${'subquery' . $var}[$k1]['description'] = array('$regex' => $v1, '$options' => 'i');
+                            }
+                        }
+                    }
+
+                    $i++;
+                }
+                for ($a_c_var = 0; $a_c_var < $s_counter; $a_c_var++) {
+
+                    if ($a == $a_c_var) {
+
+                        $query1['$or'][$a_c_var] = array('$and' => ${'subquery' . $a_c_var});
+                    }
+                }
+
+                $a++;
+            }
+            
+        } else {
+
+
+            $query1 = array(
                 '$or' => array(
-                    array('description' => array('$regex' => $user_query)),
-                    array('store' => array('$regex' => $user_query))
+                    array('description' => array('$regex' => $user_query, '$options' => 'i')),
                 )
             );
 
-        
+
             // ref http://stackoverflow.com/questions/14023821/php-mongodb-or-regex-search 
         }
-        
-        //$query = array('description' => array('$regex' => $this->searchQuery));
-        //db.groceries.find({"description": {$in:[/chocolate/,/milk/]}})
-        $query = array('description' => array('$in' => ['/chocolate milk/']));
-       // $query = array('description')=> array('$in' => array('milk');
-        $query=array('description'=>array('$in'=>array())) ;
-        
-        
-        $query = array(
-    '$or'   => array(
-        array(
-            '$and'  => array(
-                array(
-                    'description'     => array(
-                        '$regex'    => 'chocolate',
-                        '$options'  => 'i'
-                    )
-                ),
-                array(
-                    'description'  => array(
-                        '$regex' => 'milk',
-                        '$options'  => 'i'
-                    )
-                )
-            )
-        ),
-        array(
-            '$and'  => array(
-                array(
-                    'description'      => array(
-                        '$regex'    => 'milk',
-                        '$options'  => 'i'
-                    )
-                ),
-                array(
-                    'description'   => array(
-                        '$regex' => 'chocolate',
-                        '$options'  => 'i'
-                    )
-                )
-            )
-        ),
-    )
-);
-        
-        
-        
-        
-        
-        
-        
-        $searchResuls = $this->mongo->getGroceriesList($query);
-        if (empty($searchResuls)) {
-            $searchResuls = "No search results  for <b>" . $this->searchQuery . "</b>";
-        }
 
-        return $searchResuls;
-     
-    }
-
-    private function _doSearch() {
-
-        $query = array('description' => array('$regex' => $this->searchQuery));
-        $searchResuls = $this->mongo->getGroceriesList($query);
-        //$searchResuls = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($searchResuls));
-
+   
+        $searchResuls = $this->mongo->getGroceriesList($query1);
+        $searchResuls=$this->highlightSearch($searchResuls, $arr_query);
+        //echo "<pre>".print_r($searchResuls, TRUE)."</pre>";
         if (empty($searchResuls)) {
             $searchResuls = "No search results  for <b>" . $this->searchQuery . "</b>";
         }
 
         return $searchResuls;
     }
+
+    
 
     public function savingsEstimator($price1, $price2, $add_sign = TRUE) {
         $price1 = str_replace('$', '', $price1);

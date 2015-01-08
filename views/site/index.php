@@ -35,9 +35,8 @@ use yii\bootstrap\ActiveForm;
 
                 </tr>
                 <?php
-                reset($result);
-                
-                while (list($var1, $val1) = each($result)) {
+                 reset($result);
+                 while (list($var1, $val1) = each($result)) {
                     reset($val1);
                     echo "<tr>";
                     while (list($var2, $val2) = each($val1)) {
@@ -66,6 +65,8 @@ use yii\bootstrap\ActiveForm;
         //echo "<pre>".print_r($tableHeaders, TRUE)."</pre>";
     }
     if ($result) {
+        
+        //here diplayed it nothing found
         echo "<pre>" . print_r($result, TRUE) . "</pre>";
     }
 }
